@@ -30,9 +30,7 @@ describe("HomePage", () => {
     renderWithProviders(<HomePage />);
 
     await waitFor(() => {
-      expect(
-        screen.queryByText(usersResponse[0].name),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText(usersResponse[0].name)).not.toBeInTheDocument();
     });
   });
 });
