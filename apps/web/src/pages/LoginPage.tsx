@@ -1,23 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { LoginForm } from "../components/LoginForm";
-import { getErrorMessage, useLoginMutation } from "@alpha/state";
+import { WelcomeCard } from "../components/WelcomeCard";
+import {
+  type LoginResponse,
+  getErrorMessage,
+  useLoginMutation,
+} from "@alpha/state";
 
 export const LoginPage: React.FC = () => {
-  // Here you would use your login mutation hook
-  // Example:
   const [login, { isLoading, error }] = useLoginMutation();
+  const [authenticatedUser, setAuthenticatedUser] =
+    useState<LoginResponse | null>(null);
 
   const handleLogin = async (username: string, password: string) => {
-    console.log("Login attempt:", { username, password });
-
-    // Call your mutation here
     try {
       const response = await login({ username, password }).unwrap();
-      // Handle successful login (redirect, etc.)
-      console.log("success", response);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      setAuthenticatedUser(response);
     } catch (e) {
-      console.log("error", e);
+      console.error("Login failed:", e);
     }
   };
 
@@ -32,11 +32,22 @@ export const LoginPage: React.FC = () => {
         padding: "20px",
       }}
     >
-      <LoginForm
-        onSubmit={handleLogin}
-        backendError={getErrorMessage(error)}
-        isLoading={isLoading}
-      />
+      {authenticatedUser ? (
+        <WelcomeCard
+          firstName={authenticatedUser.firstName}
+          lastName={authenticatedUser.lastName}
+          username={authenticatedUser.username}
+          email={authenticatedUser.email}
+          image={authenticatedUser.image}
+          onLogout={() => setAuthenticatedUser(null)}
+        />
+      ) : (
+        <LoginForm
+          onSubmit={handleLogin}
+          backendError={getErrorMessage(error)}
+          isLoading={isLoading}
+        />
+      )}
     </div>
   );
 };
